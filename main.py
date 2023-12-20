@@ -17,7 +17,7 @@ plt.style.use('Solarize_Light2')  # стиль графиков
 # Глобальные переменные
 le = LabelEncoder()
 nb_model = None
-path = "resources/seattle-weather.csv"
+resources_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources"
 
 def load_and_explore_data(df):
     st.subheader("Датасет:")
@@ -176,7 +176,7 @@ def gismeteo(image_paths):
                 st.image(image, caption="Прогноз", use_column_width=True)
 
 if __name__ == '__main__':
-    df = pd.read_csv(path)
+    df = pd.read_csv(resources_path + "/seattle-weather.csv")
 
     st.title(":rainbow: :rainbow[Прогноз погоды]")
 
@@ -219,18 +219,18 @@ if __name__ == '__main__':
     st.title("Проверка модели")
     st.subheader("Возьмем данные о погоде с сайта gismeteo")
     gismeteo(image_paths = [
-        "resources/gismeteo1.png",
-        "resources/gismeteo_result1.png",
-        "resources/gismeteo2.png",
-        "resources/gismeteo_result2.png"
+        resources_path + "/gismeteo1.png",
+        resources_path + "/gismeteo_result1.png",
+        resources_path + "/gismeteo2.png",
+        resources_path + "/gismeteo_result2.png"
     ])
 
     st.subheader("Теперь спрогнозируем другую погоду")
     gismeteo(image_paths = [
-        "resources/miami1.png",
-        "resources/miami_result1.png",
-        "resources/miami2.png",
-        "resources/miami_result2.png"
+        resources_path + "/miami1.png",
+        resources_path + "/miami_result1.png",
+        resources_path + "/miami2.png",
+        resources_path + "/miami_result2.png"
     ])
 
     predict()
