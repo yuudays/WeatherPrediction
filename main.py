@@ -1,24 +1,26 @@
 import DB_CONNECT as db
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.preprocessing import LabelEncoder
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 from PIL import Image
 from querylist import queryCreate,queryDrop,queryInsert
-
+from joblib import dump, load
+from train_model import WeatherClassifier
+import os
 plt.style.use('Solarize_Light2')  # стиль графиков
 
 # streamlit run C:\Users\kiril\PycharmProjects\WeatherPrediction\main.py
 
-# Глобальные переменные
-le = LabelEncoder()
-nb_model = None
-resources_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources"
-
+############################################Глобальные переменные
+project_directory = os.path.dirname(__file__)
+resources_path = os.path.join(project_directory, 'resources')
+model_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/nb_model.joblib"
+label_encoder_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/le.joblib"
+#####################################################################
+def get_resource_path(filename):
+    # Собираем полный путь к файлу внутри папки ресурсов
+    return os.path.join(resources_path, filename)
 def load_and_explore_data(df):
     st.subheader("Датасет:")
     num_rows_to_display = st.slider("Число отображаемых строчек", 1, len(df), 4)
@@ -86,31 +88,7 @@ def plot_weather_distribution_pie(df, feature, colors):
 
     st.pyplot(fig)
     plt.clf()
-
-def train_and_evaluate_model(df):
-    global le, nb_model  # Объявляем глобальные переменные
-
-    df['weather'] = le.fit_transform(df['weather'])
-
-    x = df[['temp_min', 'temp_max', 'precipitation', 'wind']]
-    y = df['weather']
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-
-    nb_model = GaussianNB()
-    nb_model.fit(X_train, y_train)
-
-    y_pred = nb_model.predict(X_test)
-
-    accuracy = accuracy_score(y_test, y_pred)
-    conf_matrix = confusion_matrix(y_test, y_pred)
-
-    st.subheader("Матрица ошибок:")
-    st.write(conf_matrix)
-    st.subheader(f"Точность: {accuracy:.2f}")
-
-def predict_weather(temp_min, temp_max, precipitation, wind):
-    global df, nb_model
-
+def predict_weather(temp_min, temp_max, precipitation, wind, model):
     input_data = pd.DataFrame({
         'temp_min': [temp_min],
         'temp_max': [temp_max],
@@ -118,7 +96,7 @@ def predict_weather(temp_min, temp_max, precipitation, wind):
         'wind': [wind]
     })
 
-    predicted_label = nb_model.predict(input_data[['temp_min', 'temp_max', 'precipitation', 'wind']])
+    predicted_label = model.predict(input_data[['temp_min', 'temp_max', 'precipitation', 'wind']])
 
     predicted_weather = le.inverse_transform([predicted_label])[0]
 
@@ -135,7 +113,7 @@ def predict_weather(temp_min, temp_max, precipitation, wind):
 
     return predicted_weather_ru,predicted_weather
 
-def predict():
+def predict(model):
     st.title(":sunny:Прогноз погоды:umbrella:")
 
     # Форма для ввода данных
@@ -148,7 +126,7 @@ def predict():
     checkbox_value = st.checkbox("Добавить данные в бд?")
 
     if st.button("Прогнозировать погоду"):
-        predicted_weather_ru,predicted_weather = predict_weather(temp_min, temp_max, precipitation, wind)
+        predicted_weather_ru,predicted_weather = predict_weather(temp_min, temp_max, precipitation, wind,model)
         st.success(f"Прогноз погоды: {predicted_weather_ru}")
         if checkbox_value:
             db.execute_query(queryInsert,precipitation, temp_max, temp_min, wind, predicted_weather)
@@ -176,61 +154,72 @@ def gismeteo(image_paths):
                 st.image(image, caption="Прогноз", use_column_width=True)
 
 if __name__ == '__main__':
-    df = pd.read_csv(resources_path + "/seattle-weather.csv")
-
+    df = pd.read_csv(get_resource_path("seattle-weather.csv"))
+    isTrain = False #######ВАЖНО! ЕСЛИ ХОТИТЕ ЗАНОВО ОБУЧИТЬ МОДЕЛИ, ТО СТАВЬТЕ TRUE!
+########################################################################################################################
     st.title(":rainbow: :rainbow[Прогноз погоды]")
-
     # Текст с перечислением студентов
     st.markdown("Выполнили студенты группы 1391:")
     st.markdown("- **_Мец Кирилл_**")
     st.markdown("- **_Гречишников Алексей_**")
     st.markdown("- **_Ларьков Никита_**")
-
+########################################################################################################################
     st.header("Анализ датасета")
     load_and_explore_data(df)
-
-    st.subheader("Гистограмма минимальной и максимальной температуры    :")
+########################################################################################################################
+    st.subheader("Гистограмма минимальной и максимальной температуры:")
     columns = st.columns(2)
     with columns[0]:
         plot_histogram(df, 'temp_max')
     with columns[1]:
         plot_histogram(df, 'temp_min')
-
+########################################################################################################################
     st.subheader("График минимальной и максимальной температуры в каждом месяце по годам:")
     columns = st.columns(2)
     with columns[0]:
         plot_graphics(df, 'temp_max', 'Максимальная температура (°C)')
     with columns[1]:
         plot_graphics(df, 'temp_min', 'Минимальная температура (°C)')
-
+########################################################################################################################
     st.subheader("Осадки и скорость ветра в каждом месяце по годам:")
     columns = st.columns(2)
     with columns[0]:
         plot_graphics(df, 'precipitation', 'Осадки')
     with columns[1]:
         plot_graphics(df, 'wind', 'Скорость ветра')
-
+########################################################################################################################
     st.subheader("Распределение типов погоды:")
     plot_weather_distribution_pie(df, 'weather', ['#3498db', '#f39c12', '#95a5a6', '#e74c3c', '#2ecc71'])
-
+########################################################################################################################
     st.title("Обучение модели")
-    train_and_evaluate_model(df)
-
+    if isTrain:
+        # Обучение моделей
+        Weather_Model = WeatherClassifier()
+        X_train, X_test, y_train, y_test = Weather_Model.preprocess_data(df)
+        Weather_Model.train_random_forest(X_train, y_train, X_test, y_test)
+        Weather_Model.train_knn(X_train, y_train, X_test, y_test)
+        Weather_Model.train_naive_bayes(X_train, y_train, X_test, y_test)
+        le = Weather_Model.le
+        dump(le, label_encoder_path)
+    else:
+        Weather_Model = load(model_path)
+        le = load(label_encoder_path)
+########################################################################################################################
     st.title("Проверка модели")
     st.subheader("Возьмем данные о погоде с сайта gismeteo")
     gismeteo(image_paths = [
-        resources_path + "/gismeteo1.png",
-        resources_path + "/gismeteo_result1.png",
-        resources_path + "/gismeteo2.png",
-        resources_path + "/gismeteo_result2.png"
+        get_resource_path("gismeteo1.png"),
+        get_resource_path("gismeteo_result1.png"),
+        get_resource_path("gismeteo2.png"),
+        get_resource_path("gismeteo_result2.png")
     ])
-
+########################################################################################################################
     st.subheader("Теперь спрогнозируем другую погоду")
     gismeteo(image_paths = [
-        resources_path + "/miami1.png",
-        resources_path + "/miami_result1.png",
-        resources_path + "/miami2.png",
-        resources_path + "/miami_result2.png"
+        get_resource_path("miami1.png"),
+        get_resource_path("miami_result1.png"),
+        get_resource_path("miami2.png"),
+        get_resource_path("miami_result2.png")
     ])
-
-    predict()
+########################################################################################################################
+    predict(Weather_Model)
