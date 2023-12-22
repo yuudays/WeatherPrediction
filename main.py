@@ -10,14 +10,12 @@ from train_model import WeatherClassifier
 import os
 plt.style.use('Solarize_Light2')  # стиль графиков
 
-# streamlit run C:\Users\kiril\PycharmProjects\WeatherPrediction\main.py
-
-############################################Глобальные переменные
+#Глобальные переменные
 project_directory = os.path.dirname(os.path.abspath(__file__))
 resources_path = os.path.join(project_directory, 'resources')
 model_path = os.path.join(resources_path, 'models')
 label_encoder_path = os.path.join(model_path, 'le.joblib')
-#####################################################################
+########################################################################################################################
 def get_resource_path(filename):
     # Собираем полный путь к файлу внутри папки ресурсов
     return os.path.join(resources_path, filename)
@@ -45,8 +43,6 @@ def load_and_explore_data(df):
     st.subheader("Преобразуем датасет для построения последующих графиков:")
     transform_dataset(df)
     st.write(df.head(num_rows_to_display))
-
-
 def transform_dataset(df):
     # Преобразуем столбец 'date' в формат datetime
     df['date'] = pd.to_datetime(df['date'])
@@ -106,7 +102,7 @@ def predict_weather(temp_min, temp_max, precipitation, wind, model):
 
     predicted_label = model.predict(input_data[['temp_min', 'temp_max', 'precipitation', 'wind']])
 
-    predicted_weather = le.inverse_transform([predicted_label])[0]
+    predicted_weather = Weather_Model.le.inverse_transform([predicted_label])[0]
 
     # Русификация прогнозируемой погоды
     weather_mapping = {
@@ -163,7 +159,7 @@ def gismeteo(image_paths):
 
 if __name__ == '__main__':
     df = pd.read_csv(get_resource_path("seattle-weather.csv"))
-    isTrain = False #######ВАЖНО! ЕСЛИ ХОТИТЕ ЗАНОВО ОБУЧИТЬ МОДЕЛИ, ТО СТАВЬТЕ TRUE!
+    isTrain = False #ЕСЛИ ХОТИТЕ ЗАНОВО ОБУЧИТЬ МОДЕЛИ, ТО СТАВЬТЕ TRUE!
 ########################################################################################################################
     st.title(":rainbow: :rainbow[Прогноз погоды]")
     # Текст с перечислением студентов
@@ -211,7 +207,7 @@ if __name__ == '__main__':
         dump(le, get_model_path("le.joblib"))
     else:
         Weather_Model = load(get_model_path("rf_model.joblib"))
-        le = load(get_model_path("le.joblib"))
+        Weather_Model.le = load(get_model_path("le.joblib"))
     st.subheader("Точность и лучшие параметры для обучения моделей")
     image = Image.open(get_resource_path("accuracy.png"))
     st.image(image, use_column_width=True)
