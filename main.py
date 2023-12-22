@@ -15,8 +15,8 @@ plt.style.use('Solarize_Light2')  # стиль графиков
 ############################################Глобальные переменные
 project_directory = os.path.dirname(__file__)
 resources_path = os.path.join(project_directory, 'resources')
-model_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/nb_model.joblib"
-label_encoder_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/le.joblib"
+model_path = os.path.join(project_directory, 'models')
+label_encoder_path = os.path.join(model_path, 'le.joblib')
 #####################################################################
 def get_resource_path(filename):
     # Собираем полный путь к файлу внутри папки ресурсов
