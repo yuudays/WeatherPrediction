@@ -38,10 +38,14 @@ def load_and_explore_data(df):
         db.execute_query(queryDrop)
     st.subheader("Описательная статистика данных:")
     st.write(df.describe())
-
+    st.subheader("Количество дней с определенными погодными условиями:")
+    st.write(df['weather'].value_counts())
+    st.subheader("Проверим датасет на наличие дублирующихся данных")
+    st.write(df.duplicated().sum())
     st.subheader("Преобразуем датасет для построения последующих графиков:")
     transform_dataset(df)
     st.write(df.head(num_rows_to_display))
+
 
 def transform_dataset(df):
     # Преобразуем столбец 'date' в формат datetime
@@ -195,7 +199,7 @@ if __name__ == '__main__':
     st.subheader("Распределение типов погоды:")
     plot_weather_distribution_pie(df, 'weather', ['#3498db', '#f39c12', '#95a5a6', '#e74c3c', '#2ecc71'])
 ########################################################################################################################
-    st.title("Обучение модели")
+    st.title("Обучение моделей")
     if isTrain:
         # Обучение моделей
         Weather_Model = WeatherClassifier()
@@ -208,6 +212,9 @@ if __name__ == '__main__':
     else:
         Weather_Model = load(get_model_path("rf_model.joblib"))
         le = load(get_model_path("le.joblib"))
+    st.subheader("Точность и лучшие параметры для обучения моделей")
+    image = Image.open(get_resource_path("accuracy.png"))
+    st.image(image, use_column_width=True)
 ########################################################################################################################
     st.title("Проверка модели")
     st.subheader("Возьмем данные о погоде с сайта gismeteo")
