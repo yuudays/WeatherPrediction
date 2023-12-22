@@ -8,7 +8,7 @@ from querylist import queryCreate,queryDrop,queryInsert
 from joblib import dump, load
 from train_model import WeatherClassifier
 import os
-plt.style.use('Solarize_Light2')  # стиль графиков
+plt.style.use('Solarize_Light2')  ## стиль графиков
 
 ## Глобальные переменные
 project_directory = os.path.dirname(os.path.abspath(__file__))
