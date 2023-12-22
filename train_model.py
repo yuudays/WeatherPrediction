@@ -9,9 +9,9 @@ import os
 class WeatherClassifier:
     def __init__(self):
         self.le = LabelEncoder()
-        self.rf_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/rf_model.joblib"
-        self.knn_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/knn_model.joblib"
-        self.nb_path = "C:/Users/kiril/PycharmProjects/WeatherPrediction/resources/models/nb_model.joblib"
+        self.rf_path = os.path.join("resources", "models", "rf_model.joblib")
+        self.knn_path = os.path.join("resources", "models", "knn_model.joblib")
+        self.nb_path = os.path.join("resources", "models", "nb_model.joblib")
 
     def preprocess_data(self, df):
         df['weather'] = self.le.fit_transform(df['weather']) # Преобразуем текстовые данные в числовые

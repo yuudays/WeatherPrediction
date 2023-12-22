@@ -13,14 +13,18 @@ plt.style.use('Solarize_Light2')  # стиль графиков
 # streamlit run C:\Users\kiril\PycharmProjects\WeatherPrediction\main.py
 
 ############################################Глобальные переменные
-project_directory = os.path.dirname(__file__)
+project_directory = os.path.dirname(os.path.abspath(__file__))
 resources_path = os.path.join(project_directory, 'resources')
-model_path = os.path.join(project_directory, 'models')
+model_path = os.path.join(resources_path, 'models')
 label_encoder_path = os.path.join(model_path, 'le.joblib')
 #####################################################################
 def get_resource_path(filename):
     # Собираем полный путь к файлу внутри папки ресурсов
     return os.path.join(resources_path, filename)
+def get_model_path(filename):
+    # Собираем полный путь к файлу внутри папки ресурсов
+    return os.path.join(model_path, filename)
+
 def load_and_explore_data(df):
     st.subheader("Датасет:")
     num_rows_to_display = st.slider("Число отображаемых строчек", 1, len(df), 4)
@@ -200,10 +204,10 @@ if __name__ == '__main__':
         Weather_Model.train_knn(X_train, y_train, X_test, y_test)
         Weather_Model.train_naive_bayes(X_train, y_train, X_test, y_test)
         le = Weather_Model.le
-        dump(le, label_encoder_path)
+        dump(le, get_model_path("le.joblib"))
     else:
-        Weather_Model = load(model_path)
-        le = load(label_encoder_path)
+        Weather_Model = load(get_model_path("rf_model.joblib"))
+        le = load(get_model_path("le.joblib"))
 ########################################################################################################################
     st.title("Проверка модели")
     st.subheader("Возьмем данные о погоде с сайта gismeteo")
