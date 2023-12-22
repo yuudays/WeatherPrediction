@@ -17,10 +17,10 @@ model_path = os.path.join(resources_path, 'models')
 label_encoder_path = os.path.join(model_path, 'le.joblib')
 ########################################################################################################################
 def get_resource_path(filename):
-    # Собираем полный путь к файлу внутри папки ресурсов
+    # Собираем полный путь к файлу внутри папки resources
     return os.path.join(resources_path, filename)
 def get_model_path(filename):
-    # Собираем полный путь к файлу внутри папки ресурсов
+    # Собираем полный путь к файлу внутри папки models
     return os.path.join(model_path, filename)
 
 def load_and_explore_data(df):
@@ -50,12 +50,12 @@ def transform_dataset(df):
     # Извлекаем год и месяц из столбца 'date'
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month
-def plot_histogram(df, feature):
+def plot_histogram(df, feature,xlabel):
     fig, ax = plt.subplots(figsize=(12, 6))
 
     ax.hist(df[feature], bins=20, color="lightblue")
 
-    ax.set_xlabel("Максимальная температура")
+    ax.set_xlabel(xlabel)
     ax.set_ylabel("Количество")
 
     st.pyplot(fig)
@@ -174,9 +174,9 @@ if __name__ == '__main__':
     st.subheader("Гистограмма минимальной и максимальной температуры:")
     columns = st.columns(2)
     with columns[0]:
-        plot_histogram(df, 'temp_max')
+        plot_histogram(df, 'temp_max',"Максимальная температура")
     with columns[1]:
-        plot_histogram(df, 'temp_min')
+        plot_histogram(df, 'temp_min',"Минимальная температура")
 ########################################################################################################################
     st.subheader("График минимальной и максимальной температуры в каждом месяце по годам:")
     columns = st.columns(2)
