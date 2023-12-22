@@ -146,7 +146,7 @@ def gismeteo(image_paths):
             if i == 0:
                 st.image(image, caption="Погода на сайте", use_column_width=True)
             elif i == 1:
-                st.image(image, caption="Прогнозы", use_column_width=True)
+                st.image(image, caption="Прогноз", use_column_width=True)
 
     # Вывод изображений во второй колонке
     with columns[1]:
