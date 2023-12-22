@@ -12,13 +12,12 @@ class WeatherClassifier:
         self.rf_path = os.path.join("resources", "models", "rf_model.joblib")
         self.knn_path = os.path.join("resources", "models", "knn_model.joblib")
         self.nb_path = os.path.join("resources", "models", "nb_model.joblib")
-
     def preprocess_data(self, df):
-        df['weather'] = self.le.fit_transform(df['weather']) # Преобразуем текстовые данные в числовые
-        x = df[['temp_min', 'temp_max', 'precipitation', 'wind']] # Признаки для обучения
-        y = df['weather'] # Целевая переменная (по сути ответы для обучения)
+        df['weather'] = self.le.fit_transform(df['weather']) ## Преобразуем текстовые данные в числовые
+        x = df[['temp_min', 'temp_max', 'precipitation', 'wind']] ## Признаки для обучения
+        y = df['weather'] ## Целевая переменная (по сути ответы для обучения)
 
-        # Разделение данных на обучающую и тестовую выборки (80% для обучения, 20 для тестирования)
+        ## Разделение данных на обучающую и тестовую выборки (80% для обучения, 20 для тестирования)
         X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
         return X_train, X_test, y_train, y_test
@@ -27,7 +26,7 @@ class WeatherClassifier:
         rf_param_grid = {
             'n_estimators': [50, 100, 150],
             'max_depth': [None, 10, 20],
-            'min_samples_split': [2, 5, 10],
+            'min_samples_split': [2, 5, 10]
         }
         rf_model = RandomForestClassifier()
         rf_grid_search = GridSearchCV(rf_model, rf_param_grid, cv=5, refit=True, scoring='accuracy')

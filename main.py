@@ -10,17 +10,17 @@ from train_model import WeatherClassifier
 import os
 plt.style.use('Solarize_Light2')  # стиль графиков
 
-#Глобальные переменные
+## Глобальные переменные
 project_directory = os.path.dirname(os.path.abspath(__file__))
 resources_path = os.path.join(project_directory, 'resources')
 model_path = os.path.join(resources_path, 'models')
 label_encoder_path = os.path.join(model_path, 'le.joblib')
 ########################################################################################################################
 def get_resource_path(filename):
-    # Собираем полный путь к файлу внутри папки resources
+    ## Собираем полный путь к файлу внутри папки resources
     return os.path.join(resources_path, filename)
 def get_model_path(filename):
-    # Собираем полный путь к файлу внутри папки models
+    ## Собираем полный путь к файлу внутри папки models
     return os.path.join(model_path, filename)
 
 def load_and_explore_data(df):
@@ -44,10 +44,10 @@ def load_and_explore_data(df):
     transform_dataset(df)
     st.write(df.head(num_rows_to_display))
 def transform_dataset(df):
-    # Преобразуем столбец 'date' в формат datetime
+    ## Преобразуем столбец 'date' в формат datetime
     df['date'] = pd.to_datetime(df['date'])
 
-    # Извлекаем год и месяц из столбца 'date'
+    ## Извлекаем год и месяц из столбца 'date'
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month
 def plot_histogram(df, feature,xlabel):
@@ -63,10 +63,10 @@ def plot_histogram(df, feature,xlabel):
     plt.clf()
 
 def plot_graphics(df, feature, ylabel):
-    # Создаем сетку графиков
+    ## Создаем сетку графиков
     g = sns.FacetGrid(df, col='year', col_wrap=2, height=4)
 
-    # На каждом графике строим линейный график для 'month' и выбранного признака (feature)
+    ## На каждом графике строим линейный график для 'month' и выбранного признака (feature)
     g.map(sns.lineplot, 'month', feature)
 
     g.set_axis_labels('Месяц', ylabel)
@@ -78,14 +78,14 @@ def plot_graphics(df, feature, ylabel):
     plt.clf()
 
 def plot_weather_distribution_pie(df, feature, colors):
-    # Вычисляем количество вхождений каждой уникальной категории в признаке
+    ## Вычисляем количество вхождений каждой уникальной категории в признаке
     x = df[feature].value_counts()
     fig, ax = plt.subplots(figsize=(12, 10))
 
-    # Построение круговой диаграммы
+    ## Построение круговой диаграммы
     ax.pie(x, labels=None, autopct='%1.1f%%', startangle=90, colors=colors)
 
-    # Установка легенды с русскоязычными названиями
+    ## Установка легенды с русскоязычными названиями
     legend_labels = {"rain": "Дождь", "fog": "Туман", "sun": "Солнце", "snow": "Снег", "drizzle": "Мелкий дождь"}
     ax.legend(labels=[legend_labels[label] for label in x.index],
               title="Названия секторов", bbox_to_anchor=(1, 1), frameon = True)
@@ -104,7 +104,7 @@ def predict_weather(temp_min, temp_max, precipitation, wind, model):
 
     predicted_weather = Weather_Model.le.inverse_transform([predicted_label])[0]
 
-    # Русификация прогнозируемой погоды
+    ## Русификация прогнозируемой погоды
     weather_mapping = {
         'rain': 'Дождь',
         'fog': 'Туман',
@@ -120,13 +120,13 @@ def predict_weather(temp_min, temp_max, precipitation, wind, model):
 def predict(model):
     st.title(":sunny:Прогноз погоды:umbrella:")
 
-    # Форма для ввода данных
+    ## Форма для ввода данных
     temp_min = st.slider("Минимальная температура", min_value=-10.0, max_value=40.0, value=15.0,step=0.1)
     temp_max = st.slider("Максимальная температура", min_value=-10.0, max_value=40.0, value=25.0,step=0.1)
     precipitation = st.slider("Осадки", min_value=0.0, max_value=50.0, value=10.0,step=0.1)
     wind = st.slider("Скорость ветра", min_value=0.0, max_value=30.0, value=5.0,step=0.1)
 
-    # Кнопка для выполнения прогнозирования
+    ## Кнопка для выполнения прогнозирования
     checkbox_value = st.checkbox("Добавить данные в бд?")
 
     if st.button("Прогнозировать погоду"):
@@ -136,10 +136,10 @@ def predict(model):
             db.execute_query(queryInsert,precipitation, temp_max, temp_min, wind, predicted_weather)
 
 def gismeteo(image_paths):
-    # Разделение на две колонки
+    ## Разделение на две колонки
     columns = st.columns(2)
 
-    # Вывод изображений в первой колонке
+    ## Вывод изображений в первой колонке
     with columns[0]:
         for i in range(0, 2):
             image = Image.open(image_paths[i])
@@ -148,7 +148,7 @@ def gismeteo(image_paths):
             elif i == 1:
                 st.image(image, caption="Прогноз", use_column_width=True)
 
-    # Вывод изображений во второй колонке
+    ## Вывод изображений во второй колонке
     with columns[1]:
         for i in range(2, 4):
             image = Image.open(image_paths[i])
@@ -159,10 +159,10 @@ def gismeteo(image_paths):
 
 if __name__ == '__main__':
     df = pd.read_csv(get_resource_path("seattle-weather.csv"))
-    isTrain = False #ЕСЛИ ХОТИТЕ ЗАНОВО ОБУЧИТЬ МОДЕЛИ, ТО СТАВЬТЕ TRUE!
+    isTrain = False ##ЕСЛИ ХОТИТЕ ЗАНОВО ОБУЧИТЬ МОДЕЛИ, ТО СТАВЬТЕ TRUE!
 ########################################################################################################################
     st.title(":rainbow: :rainbow[Прогноз погоды]")
-    # Текст с перечислением студентов
+    ## Текст с перечислением студентов
     st.markdown("Выполнили студенты группы 1391:")
     st.markdown("- **_Мец Кирилл_**")
     st.markdown("- **_Гречишников Алексей_**")
@@ -197,7 +197,7 @@ if __name__ == '__main__':
 ########################################################################################################################
     st.title("Обучение моделей")
     if isTrain:
-        # Обучение моделей
+        ## Обучение моделей
         Weather_Model = WeatherClassifier()
         X_train, X_test, y_train, y_test = Weather_Model.preprocess_data(df)
         Weather_Model.train_random_forest(X_train, y_train, X_test, y_test)
