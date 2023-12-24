@@ -16,8 +16,8 @@ def execute_query(query, *params):
 
         connection.commit()
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except psycopg2.OperationalError as e:
+        print("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
 
     finally:
         connection.close()
@@ -30,8 +30,8 @@ def insert_data_into_db(data):
 
         connection.commit()
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except psycopg2.OperationalError as e:
+        print("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
 
     finally:
         connection.close()
