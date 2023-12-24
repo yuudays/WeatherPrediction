@@ -132,13 +132,14 @@ def predict(model):
     checkbox_value = st.checkbox("Добавить данные в бд?")
 
     if st.button("Прогнозировать погоду"):
-        st.snow()
+
         bar = st.progress(0)
 
         predicted_weather_ru,predicted_weather = predict_weather(temp_min, temp_max, precipitation, wind,model)
         bar.progress(100)
         time.sleep(0.2)
         st.success(f"Прогноз погоды: {predicted_weather_ru}")
+        bar.snow()
         if checkbox_value:
             db.execute_query(queryInsert,precipitation, temp_max, temp_min, wind, predicted_weather)
 @st.cache_data
