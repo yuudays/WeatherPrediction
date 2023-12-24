@@ -7,7 +7,6 @@
     <list default="true" id="50046f0a-6992-42e0-b91d-aae71d5f3b51" name="Changes" comment="1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +125,11 @@
       <workItem from="1703219032586" duration="12000" />
       <workItem from="1703219084654" duration="2341000" />
       <workItem from="1703254444893" duration="7354000" />
-      <workItem from="1703278858188" duration="5595000" />
+      <workItem from="1703278858188" duration="5927000" />
+      <workItem from="1703335721877" duration="79000" />
+      <workItem from="1703335863461" duration="125000" />
+      <workItem from="1703336207740" duration="419000" />
+      <workItem from="1703387984747" duration="1958000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <option name="closed" value="true" />
@@ -272,7 +275,23 @@
       <option name="project" value="LOCAL" />
       <updated>1703256512759</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="1">
+      <option name="closed" value="true" />
+      <created>1703284930547</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1703284930547</updated>
+    </task>
+    <task id="LOCAL-00020" summary="1">
+      <option name="closed" value="true" />
+      <created>1703285075861</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1703285075861</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -294,6 +313,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/WeatherPrediction$main.coverage" NAME="main Coverage Results" MODIFIED="1703283012096" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/WeatherPrediction$main.coverage" NAME="main Coverage Results" MODIFIED="1703335722863" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
