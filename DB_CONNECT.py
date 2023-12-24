@@ -1,6 +1,7 @@
 import psycopg2
 from config import host,user,password,db_name
 from querylist import queryInsertTable
+import streamlit as st
 def db_connection():
     return psycopg2.connect(
         host=host,
@@ -17,7 +18,7 @@ def execute_query(query, *params):
         connection.commit()
 
     except psycopg2.OperationalError as e:
-        print("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
+        st.error("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
 
     finally:
         connection.close()
@@ -31,7 +32,7 @@ def insert_data_into_db(data):
         connection.commit()
 
     except psycopg2.OperationalError as e:
-        print("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
+        st.error("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
 
     finally:
         connection.close()
