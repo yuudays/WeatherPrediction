@@ -10,6 +10,8 @@ def db_connection():
         database=db_name
     )
 def execute_query(query, *params):
+    st.error("На данном сайте не работает БД, если требуется работа с БД, установите проект локально")
+    return
     connection = db_connection()
     try:
         with connection.cursor() as cursor:
@@ -17,13 +19,15 @@ def execute_query(query, *params):
 
         connection.commit()
 
-    except psycopg2.OperationalError as e:
-        st.error("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
+    except Exception as e:
+        print(f"Error: {e}")
 
     finally:
         connection.close()
 
 def insert_data_into_db(data):
+    st.error("На данном сайте не работает БД, если требуется работа с БД, установите проект локально")
+    return
     connection = db_connection()
     try:
         with connection.cursor() as cursor:
@@ -31,8 +35,8 @@ def insert_data_into_db(data):
 
         connection.commit()
 
-    except psycopg2.OperationalError as e:
-        st.error("На данном сайте БД не работает, если хотите использовать БД, установите проект локально")
+    except Exception as e:
+        print(f"Error: {e}")
 
     finally:
         connection.close()
