@@ -1,3 +1,5 @@
+import time
+from streamlit_option_menu import option_menu
 import DB_CONNECT as db
 import pandas as pd
 import seaborn as sns
@@ -9,7 +11,6 @@ from joblib import dump, load
 from train_model import WeatherClassifier
 import os
 plt.style.use('Solarize_Light2')  ## стиль графиков
-#streamlit run C:\Users\kiril\PycharmProjects\WeatherPrediction\main.py
 ## Глобальные переменные
 project_directory = os.path.dirname(os.path.abspath(__file__))
 resources_path = os.path.join(project_directory, 'resources')
@@ -22,7 +23,6 @@ def get_resource_path(filename):
 def get_model_path(filename):
     ## Собираем полный путь к файлу внутри папки models
     return os.path.join(model_path, filename)
-
 def load_and_explore_data(df):
     st.subheader("Датасет:")
     num_rows_to_display = st.slider("Число отображаемых строчек", 1, len(df), 4)
@@ -50,6 +50,8 @@ def transform_dataset(df):
     ## Извлекаем год и месяц из столбца 'date'
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.month
+
+@st.cache_data
 def plot_histogram(df, feature,xlabel):
     fig, ax = plt.subplots(figsize=(12, 6))
 
@@ -61,7 +63,7 @@ def plot_histogram(df, feature,xlabel):
     st.pyplot(fig)
 
     plt.clf()
-
+@st.cache_data
 def plot_graphics(df, feature, ylabel):
     ## Создаем сетку графиков
     g = sns.FacetGrid(df, col='year', col_wrap=2, height=4)
@@ -76,7 +78,7 @@ def plot_graphics(df, feature, ylabel):
     st.pyplot(fig)
 
     plt.clf()
-
+@st.cache_data
 def plot_weather_distribution_pie(df, feature, colors):
     ## Вычисляем количество вхождений каждой уникальной категории в признаке
     x = df[feature].value_counts()
@@ -130,11 +132,16 @@ def predict(model):
     checkbox_value = st.checkbox("Добавить данные в бд?")
 
     if st.button("Прогнозировать погоду"):
+        st.snow()
+        bar = st.progress(0)
+
         predicted_weather_ru,predicted_weather = predict_weather(temp_min, temp_max, precipitation, wind,model)
+        bar.progress(100)
+        time.sleep(0.2)
         st.success(f"Прогноз погоды: {predicted_weather_ru}")
         if checkbox_value:
             db.execute_query(queryInsert,precipitation, temp_max, temp_min, wind, predicted_weather)
-
+@st.cache_data
 def gismeteo(image_paths):
     ## Разделение на две колонки
     columns = st.columns(2)
@@ -167,7 +174,6 @@ if __name__ == '__main__':
     st.markdown("- **_Мец Кирилл_**")
     st.markdown("- **_Гречишников Алексей_**")
     st.markdown("- **_Ларьков Никита_**")
-
     if isTrain:
         ## Обучение моделей
         Weather_Model = WeatherClassifier()
@@ -180,57 +186,63 @@ if __name__ == '__main__':
     else:
         Weather_Model = load(get_model_path("rf_model.joblib"))
         Weather_Model.le = load(get_model_path("le.joblib"))
-    predict(Weather_Model)
+    selected = option_menu(menu_title=None,
+                           options=["Прогноз погоды","Анализ и визуализация данных"],
+                           icons=["pencil-fill","bar-chart-fill"],
+                           orientation="horizontal")
+    if selected == "Прогноз погоды":
+        predict(Weather_Model)
+    if selected == "Анализ и визуализация данных":
 ########################################################################################################################
-    with st.expander("Показать анализ датасета"):
-        st.header("Анализ датасета")
-        load_and_explore_data(df)
+        with st.expander("Показать анализ датасета"):
+            st.header("Анализ датасета")
+            load_and_explore_data(df)
 ########################################################################################################################
-    with st.expander("Показать графики"):
-        st.subheader("Гистограмма минимальной и максимальной температуры:")
-        columns = st.columns(2)
-        with columns[0]:
-            plot_histogram(df, 'temp_max',"Максимальная температура")
-        with columns[1]:
-            plot_histogram(df, 'temp_min',"Минимальная температура")
+        with st.expander("Показать графики"):
+            st.subheader("Гистограмма минимальной и максимальной температуры:")
+            columns = st.columns(2)
+            with columns[0]:
+                plot_histogram(df, 'temp_max',"Максимальная температура")
+            with columns[1]:
+                plot_histogram(df, 'temp_min',"Минимальная температура")
 ########################################################################################################################
-        st.subheader("График минимальной и максимальной температуры в каждом месяце по годам:")
-        columns = st.columns(2)
-        with columns[0]:
-            plot_graphics(df, 'temp_max', 'Максимальная температура (°C)')
-        with columns[1]:
-            plot_graphics(df, 'temp_min', 'Минимальная температура (°C)')
+            st.subheader("График минимальной и максимальной температуры в каждом месяце по годам:")
+            columns = st.columns(2)
+            with columns[0]:
+                plot_graphics(df, 'temp_max', 'Максимальная температура (°C)')
+            with columns[1]:
+                plot_graphics(df, 'temp_min', 'Минимальная температура (°C)')
 ########################################################################################################################
-        st.subheader("Осадки и скорость ветра в каждом месяце по годам:")
-        columns = st.columns(2)
-        with columns[0]:
-            plot_graphics(df, 'precipitation', 'Осадки')
-        with columns[1]:
-            plot_graphics(df, 'wind', 'Скорость ветра')
+            st.subheader("Осадки и скорость ветра в каждом месяце по годам:")
+            columns = st.columns(2)
+            with columns[0]:
+                plot_graphics(df, 'precipitation', 'Осадки')
+            with columns[1]:
+                plot_graphics(df, 'wind', 'Скорость ветра')
 ########################################################################################################################
-        st.subheader("Распределение типов погоды:")
-        plot_weather_distribution_pie(df, 'weather', ['#3498db', '#f39c12', '#95a5a6', '#e74c3c', '#2ecc71'])
+            st.subheader("Распределение типов погоды:")
+            plot_weather_distribution_pie(df, 'weather', ['#3498db', '#f39c12', '#95a5a6', '#e74c3c', '#2ecc71'])
 ########################################################################################################################
-    with st.expander("Показать обучение и проверку моделей"):
-        st.title("Обучение моделей")
-        st.subheader("Точность и лучшие параметры для обучения моделей")
-        image = Image.open(get_resource_path("accuracy.png"))
-        st.image(image, use_column_width=True)
+        with st.expander("Показать обучение и проверку моделей"):
+            st.title("Обучение моделей")
+            st.subheader("Точность и лучшие параметры для обучения моделей")
+            image = Image.open(get_resource_path("accuracy.png"))
+            st.image(image, use_column_width=True)
 ########################################################################################################################
-        st.title("Проверка модели")
-        st.subheader("Возьмем данные о погоде с сайта gismeteo")
-        gismeteo(image_paths = [
-            get_resource_path("gismeteo1.png"),
-            get_resource_path("gismeteo_result1.png"),
-            get_resource_path("gismeteo2.png"),
-            get_resource_path("gismeteo_result2.png")
-        ])
+            st.title("Проверка модели")
+            st.subheader("Возьмем данные о погоде с сайта gismeteo")
+            gismeteo(image_paths = [
+                get_resource_path("gismeteo1.png"),
+                get_resource_path("gismeteo_result1.png"),
+                get_resource_path("gismeteo2.png"),
+                get_resource_path("gismeteo_result2.png")
+            ])
 ########################################################################################################################
-        st.subheader("Теперь спрогнозируем другую погоду")
-        gismeteo(image_paths = [
-            get_resource_path("miami1.png"),
-            get_resource_path("miami_result1.png"),
-            get_resource_path("miami2.png"),
-            get_resource_path("miami_result2.png")
-        ])
+            st.subheader("Теперь спрогнозируем другую погоду")
+            gismeteo(image_paths = [
+                get_resource_path("miami1.png"),
+                get_resource_path("miami_result1.png"),
+                get_resource_path("miami2.png"),
+                get_resource_path("miami_result2.png")
+            ])
 ########################################################################################################################
